@@ -1,0 +1,137 @@
+version: "3.8"
+
+networks:
+  kcispnpg:
+    name: kcispnpg
+
+services:
+  postgres-ispn:
+    image: postgres:12.4
+    container_name: postgres-ispn
+    networks:
+      - kcispnpg
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: infinispan
+
+  postgres-kc:
+    image: postgres:12.4
+    container_name: postgres-kc
+    networks:
+      - kcispnpg
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: keycloak
+
+  ispn-node1:
+    build: ./infinispan
+    container_name: ispn-node1
+    networks:
+      kcispnpg:
+        aliases:
+          - ispn
+    ports:
+      - 9990:9990
+      - 8080:8080
+      #- 11222:11222
+    environment:
+      DATABASE_HOST: postgres-ispn:5432
+      DATABASE_NAME: infinispan
+      DATABASE_USERNAME: postgres
+      DATABASE_PASSWORD: postgres
+      MGMT_USER: admin
+      MGMT_PASS: admin
+      APP_USER: ispn
+      APP_PASS: ispn
+
+  ispn-node2:
+    build: ./infinispan
+    container_name: ispn-node2
+    networks:
+      kcispnpg:
+        aliases:
+          - ispn
+    ports:
+      - 9991:9990
+      - 8081:8080
+      #- 11222:11222
+    environment:
+      DATABASE_HOST: postgres-ispn:5432
+      DATABASE_NAME: infinispan
+      DATABASE_USERNAME: postgres
+      DATABASE_PASSWORD: postgres
+      MGMT_USER: admin
+      MGMT_PASS: admin
+      APP_USER: ispn
+      APP_PASS: ispn
+
+  kc-node1:
+    build: ./keycloak
+    container_name: kc-node1
+    networks:
+      - kcispnpg
+    environment:
+      DATABASE_HOST: postgres-kc:5432
+      DATABASE_NAME: keycloak
+      DATABASE_USERNAME: postgres
+      DATABASE_PASSWORD: postgres
+      KEYCLOAK_FRONTEND_URL: http://localhost/auth
+      # Optional
+      KEYCLOAK_NODE_NETWORK_INTERFACE: eth0
+      KEYCLOAK_ADMIN_USERNAME: admin
+      KEYCLOAK_ADMIN_PASSWORD: admin
+      INFINISPAN_REMOTE_CACHE_HOST: ispn
+      # Optional (default: 11222)
+      INFINISPAN_REMOTE_CACHE_PORT: 11222
+      INFINISPAN_CLIENT_HOTROD_AUTH_USERNAME: ispn
+      INFINISPAN_CLIENT_HOTROD_AUTH_PASSWORD: ispn
+      # Optional (default: ${INFINISPAN_REMOTE_CACHE_HOST})
+      INFINISPAN_CLIENT_HOTROD_AUTH_SERVER_NAME: ispn
+      # Optional (default: ApplicationRealm)
+      INFINISPAN_CLIENT_HOTROD_AUTH_REALM: ApplicationRealm
+      # Optional (default: PLAIN)
+      INFINISPAN_CLIENT_HOTROD_SASL_MECHANISM: PLAIN
+
+  kc-node2:
+    build: ./keycloak
+    container_name: kc-node2
+    networks:
+      - kcispnpg
+    environment:
+      DATABASE_HOST: postgres-kc:5432
+      DATABASE_NAME: keycloak
+      DATABASE_USERNAME: postgres
+      DATABASE_PASSWORD: postgres
+      KEYCLOAK_FRONTEND_URL: http://localhost/auth
+      # Optional
+      KEYCLOAK_NODE_NETWORK_INTERFACE: eth0
+      KEYCLOAK_ADMIN_USERNAME: admin
+      KEYCLOAK_ADMIN_PASSWORD: admin
+      INFINISPAN_REMOTE_CACHE_HOST: ispn
+      # Optional (default: 11222)
+      INFINISPAN_REMOTE_CACHE_PORT: 11222
+      INFINISPAN_CLIENT_HOTROD_AUTH_USERNAME: ispn
+      INFINISPAN_CLIENT_HOTROD_AUTH_PASSWORD: ispn
+      # Optional (default: ${INFINISPAN_REMOTE_CACHE_HOST})
+      INFINISPAN_CLIENT_HOTROD_AUTH_SERVER_NAME: ispn
+      # Optional (default: ApplicationRealm)
+      INFINISPAN_CLIENT_HOTROD_AUTH_REALM: ApplicationRealm
+      # Optional (default: PLAIN)
+      INFINISPAN_CLIENT_HOTROD_SASL_MECHANISM: PLAIN
+
+  kc-lb:
+    image: httpd:2.4
+    depends_on:
+      - kc-node1
+      - kc-node2
+    networks:
+      - kcispnpg
+    ports:
+      - 80:80
+    volumes:
+      - ./load-balancer/httpd.conf:/usr/local/apache2/conf/httpd.conf
+    environment:
+      TARGET_HOST1: kc-node1:8080
+      TARGET_HOST2: kc-node2:8080
