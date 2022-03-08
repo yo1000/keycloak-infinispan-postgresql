@@ -126,6 +126,7 @@ services:
     depends_on:
       - kc-node1
       - kc-node2
+    container_name: kc-lb
     networks:
       - kcispnpg
     ports:
