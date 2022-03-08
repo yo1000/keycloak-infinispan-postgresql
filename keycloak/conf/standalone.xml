@@ -252,10 +252,70 @@
                         <!--<property name="infinispan.client.hotrod.trust_store_password">changeit</property>-->
                     </remote-store>
                 </local-cache>
-                <local-cache name="authenticationSessions"/>
-                <local-cache name="offlineSessions"/>
-                <local-cache name="clientSessions"/>
-                <local-cache name="offlineClientSessions"/>
+                <!--<local-cache name="authenticationSessions"/>-->
+                <local-cache name="authenticationSessions">
+                    <remote-store cache="authenticationSessions" remote-servers="remote-cache" passivation="false"
+                                  fetch-state="false" purge="false" preload="false" shared="true">
+                        <property name="rawValues">true</property>
+                        <property name="marshaller">org.keycloak.cluster.infinispan.KeycloakHotRodMarshallerFactory</property>
+                        <property name="infinispan.client.hotrod.auth_username">${infinispan.client.hotrod.auth_username}</property>
+                        <property name="infinispan.client.hotrod.auth_password">${infinispan.client.hotrod.auth_password}</property>
+                        <property name="infinispan.client.hotrod.auth_realm">${infinispan.client.hotrod.auth_realm:default}</property>
+                        <property name="infinispan.client.hotrod.auth_server_name">${infinispan.client.hotrod.auth_server_name}</property>
+                        <property name="infinispan.client.hotrod.sasl_mechanism">${infinispan.client.hotrod.sasl_mechanism:PLAIN}</property>
+                        <!--<property name="infinispan.client.hotrod.trust_store_file_name">/etc/pki/java/cacerts</property>-->
+                        <!--<property name="infinispan.client.hotrod.trust_store_type">JKS</property>-->
+                        <!--<property name="infinispan.client.hotrod.trust_store_password">changeit</property>-->
+                    </remote-store>
+                </local-cache>
+                <!--<local-cache name="offlineSessions"/>-->
+                <local-cache name="offlineSessions">
+                    <remote-store cache="offlineSessions" remote-servers="remote-cache" passivation="false"
+                                  fetch-state="false" purge="false" preload="false" shared="true">
+                        <property name="rawValues">true</property>
+                        <property name="marshaller">org.keycloak.cluster.infinispan.KeycloakHotRodMarshallerFactory</property>
+                        <property name="infinispan.client.hotrod.auth_username">${infinispan.client.hotrod.auth_username}</property>
+                        <property name="infinispan.client.hotrod.auth_password">${infinispan.client.hotrod.auth_password}</property>
+                        <property name="infinispan.client.hotrod.auth_realm">${infinispan.client.hotrod.auth_realm:default}</property>
+                        <property name="infinispan.client.hotrod.auth_server_name">${infinispan.client.hotrod.auth_server_name}</property>
+                        <property name="infinispan.client.hotrod.sasl_mechanism">${infinispan.client.hotrod.sasl_mechanism:PLAIN}</property>
+                        <!--<property name="infinispan.client.hotrod.trust_store_file_name">/etc/pki/java/cacerts</property>-->
+                        <!--<property name="infinispan.client.hotrod.trust_store_type">JKS</property>-->
+                        <!--<property name="infinispan.client.hotrod.trust_store_password">changeit</property>-->
+                    </remote-store>
+                </local-cache>
+                <!--<local-cache name="clientSessions"/>-->
+                <local-cache name="clientSessions">
+                    <remote-store cache="clientSessions" remote-servers="remote-cache" passivation="false"
+                                  fetch-state="false" purge="false" preload="false" shared="true">
+                        <property name="rawValues">true</property>
+                        <property name="marshaller">org.keycloak.cluster.infinispan.KeycloakHotRodMarshallerFactory</property>
+                        <property name="infinispan.client.hotrod.auth_username">${infinispan.client.hotrod.auth_username}</property>
+                        <property name="infinispan.client.hotrod.auth_password">${infinispan.client.hotrod.auth_password}</property>
+                        <property name="infinispan.client.hotrod.auth_realm">${infinispan.client.hotrod.auth_realm:default}</property>
+                        <property name="infinispan.client.hotrod.auth_server_name">${infinispan.client.hotrod.auth_server_name}</property>
+                        <property name="infinispan.client.hotrod.sasl_mechanism">${infinispan.client.hotrod.sasl_mechanism:PLAIN}</property>
+                        <!--<property name="infinispan.client.hotrod.trust_store_file_name">/etc/pki/java/cacerts</property>-->
+                        <!--<property name="infinispan.client.hotrod.trust_store_type">JKS</property>-->
+                        <!--<property name="infinispan.client.hotrod.trust_store_password">changeit</property>-->
+                    </remote-store>
+                </local-cache>
+                <!--<local-cache name="offlineClientSessions"/>-->
+                <local-cache name="offlineClientSessions">
+                    <remote-store cache="offlineClientSessions" remote-servers="remote-cache" passivation="false"
+                                  fetch-state="false" purge="false" preload="false" shared="true">
+                        <property name="rawValues">true</property>
+                        <property name="marshaller">org.keycloak.cluster.infinispan.KeycloakHotRodMarshallerFactory</property>
+                        <property name="infinispan.client.hotrod.auth_username">${infinispan.client.hotrod.auth_username}</property>
+                        <property name="infinispan.client.hotrod.auth_password">${infinispan.client.hotrod.auth_password}</property>
+                        <property name="infinispan.client.hotrod.auth_realm">${infinispan.client.hotrod.auth_realm:default}</property>
+                        <property name="infinispan.client.hotrod.auth_server_name">${infinispan.client.hotrod.auth_server_name}</property>
+                        <property name="infinispan.client.hotrod.sasl_mechanism">${infinispan.client.hotrod.sasl_mechanism:PLAIN}</property>
+                        <!--<property name="infinispan.client.hotrod.trust_store_file_name">/etc/pki/java/cacerts</property>-->
+                        <!--<property name="infinispan.client.hotrod.trust_store_type">JKS</property>-->
+                        <!--<property name="infinispan.client.hotrod.trust_store_password">changeit</property>-->
+                    </remote-store>
+                </local-cache>
                 <!--<local-cache name="loginFailures"/>-->
                 <local-cache name="loginFailures">
                     <remote-store cache="loginFailures" remote-servers="remote-cache" passivation="false"
