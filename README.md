@@ -22,6 +22,39 @@ docker-compose version 1.29.2, build 5becea4c
 docker-compose up --build
 ```
 
+## How to testing
+
+1. Run all containers
+
+```
+docker-compose up --build
+```
+
+2. Sign on to Security admin console
+
+http://localhost/auth/admin/
+
+* Username: `admin`
+* Password: `admin`
+
+3. Dispose Keycloak and Infinispan containers
+
+```
+docker container stop kc-node1 kc-node2 ispn-node1 ispn-node2
+docker container rm kc-node1 kc-node2 ispn-node1 ispn-node2
+```
+
+4. Rerun Keycloak and Infinispan containers
+
+```
+docker-compose up ispn-node1 ispn-node2 kc-node1 kc-node2
+```
+
+5. Transition to any pages
+
+If all goes well, you should be able to make page transitions 
+without being asked to sign-on again and with the authentication session keeped.
+
 ## Configuration Overview
 
 Components
