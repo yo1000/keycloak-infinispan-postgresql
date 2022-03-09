@@ -1,6 +1,6 @@
 # Keycloak Infinispan Postgresql
 
-By persisting cache via remote Infinispan,
+Persisting cache via remote Infinispan,
 Keycloak can be HA configured without using JGroup.
 
 ## Requirements
@@ -69,3 +69,15 @@ Components
 Client _____ LB _____ KC1 _____ DNS _____ ISPN1 _____ Postgres
                   \__ KC2 __/         \__ ISPN2 __/
 ```
+
+For example, the following combination would be used if built on AWS.
+
+```
+Client _____ ALB _____ KC1 _____ NLB _____ ISPN1 _____ RDS Aurora PostgreSQL
+                   \__ KC2 __/         \__ ISPN2 __/
+```
+
+## Configuration Hint
+
+Enabling sticky sessions at the LB layer has the advantage of improving caching efficiency.
+On the other hand, however, setting too long a Max-Age for cookies has the disadvantage that accesses will not be distributed quickly during scale-out.
