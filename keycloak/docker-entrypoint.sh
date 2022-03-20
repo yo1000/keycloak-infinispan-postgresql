@@ -4,26 +4,6 @@
 # Var prefix (from computed)  : KC_*, ISPN_*
 # Var prefix (from manually)  : KEYCLOAK_*, INFINISPAN_*
 
-# Detect Self private IP address
-if [ "x${KEYCLOAK_NODE_NETWORK_INTERFACE}" = "x" ]; then
-    KC_NODE_ADDR=$( \
-        ip -f inet -o addr \
-        | grep -v '127.0.0.1' \
-        | cut -d ' ' -f 7 \
-        | cut -d '/' -f 1 \
-        || echo '127.0.0.1' \
-    )
-else
-    KC_NODE_ADDR=$( \
-        ip -f inet -o addr show "${KEYCLOAK_NODE_NETWORK_INTERFACE}" \
-        | cut -d ' ' -f 7 \
-        | cut -d '/' -f 1 \
-        || echo '127.0.0.1' \
-    )
-fi
-
-echo "KC_NODE_ADDR=${KC_NODE_ADDR}"
-
 # Add JBoss Admin user
 add-user.sh \
     -u "${JBOSS_ADMIN_USERNAME:-'admin'}" \
@@ -43,8 +23,6 @@ standalone.sh \
     -c='standalone.xml' \
     -b='0.0.0.0' \
     -bmanagement='0.0.0.0' \
-    -bprivate="${KC_NODE_ADDR}" \
-    -Djboss.tx.node.id="${KC_NODE_ADDR}" \
     -Dkeycloak.frontendUrl="${KEYCLOAK_FRONTEND_URL}" \
     -Dkeycloak.profile.feature.upload_scripts='enabled' \
     -Dinfinispan.remote.cache.host="${INFINISPAN_REMOTE_CACHE_HOST}" \
