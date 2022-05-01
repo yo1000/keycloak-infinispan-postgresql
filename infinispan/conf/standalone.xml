@@ -310,12 +310,15 @@
                 </local-cache-configuration>
 
                 <local-cache name="work" configuration="persistent-jdbc-string-keyed-postgres"/>
+                <local-cache name="realms" configuration="persistent-jdbc-string-keyed-postgres"/>
+                <local-cache name="users" configuration="persistent-jdbc-string-keyed-postgres"/>
                 <local-cache name="sessions" configuration="persistent-jdbc-string-keyed-postgres"/>
                 <local-cache name="authenticationSessions" configuration="persistent-jdbc-string-keyed-postgres"/>
                 <local-cache name="offlineSessions" configuration="persistent-jdbc-string-keyed-postgres"/>
                 <local-cache name="clientSessions" configuration="persistent-jdbc-string-keyed-postgres"/>
                 <local-cache name="offlineClientSessions" configuration="persistent-jdbc-string-keyed-postgres"/>
                 <local-cache name="loginFailures" configuration="persistent-jdbc-string-keyed-postgres"/>
+                <local-cache name="authorization" configuration="persistent-jdbc-string-keyed-postgres"/>
                 <local-cache name="actionTokens" configuration="persistent-jdbc-string-keyed-postgres"/>
             </cache-container>
         </subsystem>
