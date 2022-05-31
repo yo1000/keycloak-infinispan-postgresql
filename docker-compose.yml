@@ -98,6 +98,7 @@ services:
     networks:
       - kcispnpg
     environment:
+      DB_VENDOR: postgres
       DATABASE_HOST: postgres-kc:5432
       DATABASE_NAME: keycloak
       DATABASE_USERNAME: postgres
