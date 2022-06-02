@@ -151,7 +151,7 @@
         </subsystem>
         <subsystem xmlns="urn:jboss:domain:datasources:5.0">
             <datasources>
-                <datasource jndi-name="java:jboss/datasources/ExampleDS" pool-name="ExampleDS" enabled="true" use-java-context="true" statistics-enabled="${wildfly.datasources.statistics-enabled:${wildfly.statistics-enabled:false}}">
+                <datasource jndi-name="java:jboss/datasources/ExampleDS" pool-name="ExampleDS" enabled="true" use-java-context="true">
                     <connection-url>jdbc:h2:mem:test;DB_CLOSE_DELAY=-1;DB_CLOSE_ON_EXIT=FALSE</connection-url>
                     <driver>h2</driver>
                     <security>
@@ -160,8 +160,7 @@
                     </security>
                 </datasource>
                 <datasource jndi-name="java:jboss/datasources/KeycloakDS"
-                            pool-name="KeycloakDS" enabled="true" use-java-context="true"
-                            statistics-enabled="${wildfly.datasources.statistics-enabled:${wildfly.statistics-enabled:false}}">
+                            pool-name="KeycloakDS" enabled="true" use-java-context="true">
                     <connection-url>jdbc:postgresql://${env.DATABASE_HOST}/${env.DATABASE_NAME}</connection-url>
                     <driver>postgresql</driver>
                     <pool>
@@ -416,7 +415,6 @@
                 </process-id>
             </core-environment>
             <recovery-environment socket-binding="txn-recovery-environment" status-socket-binding="txn-status-manager"/>
-            <coordinator-environment statistics-enabled="${wildfly.transactions.statistics-enabled:${wildfly.statistics-enabled:false}}"/>
             <object-store path="tx-object-store" relative-to="jboss.server.data.dir"/>
         </subsystem>
     </profile>
@@ -429,10 +427,11 @@
         </interface>
     </interfaces>
     <socket-binding-group name="standard-sockets" default-interface="public" port-offset="${jboss.socket.binding.port-offset:0}">
+        <socket-binding name="management-http" interface="management" port="${jboss.management.http.port:9990}"/>
+        <socket-binding name="management-https" interface="management" port="${jboss.management.https.port:9993}"/>
         <socket-binding name="hotrod" port="11222"/>
         <socket-binding name="hotrod-internal" port="11223"/>
         <socket-binding name="hotrod-multi-tenancy" port="11224"/>
-        <socket-binding name="management-http" interface="management" port="${jboss.management.http.port:9990}"/>
         <socket-binding name="memcached" port="11211"/>
         <socket-binding name="rest" port="8080"/>
         <socket-binding name="rest-multi-tenancy" port="8081"/>
