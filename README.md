@@ -6,20 +6,16 @@ Keycloak can be HA configured without using JGroup.
 ## Requirements
 
 * Docker
-* Docker Compose
 
 ```
 docker --version
 Docker version 20.10.12, build e91ed57
-
-docker-compose --version
-docker-compose version 1.29.2, build 5becea4c
 ```
 
 ## How to run
 
 ```
-docker-compose up --build
+docker compose up --build
 ```
 
 ## How to testing
@@ -27,7 +23,7 @@ docker-compose up --build
 1. Run all containers
 
 ```
-docker-compose up --build
+docker compose up --build
 ```
 
 2. Sign on to Security admin console
@@ -47,7 +43,7 @@ docker container rm kc-node1 kc-node2 ispn-node1 ispn-node2
 4. Rerun Keycloak and Infinispan containers
 
 ```
-docker-compose up ispn-node1 ispn-node2 kc-node1 kc-node2
+docker compose up ispn-node1 ispn-node2 kc-node1 kc-node2
 ```
 
 5. Transition to any pages
@@ -61,7 +57,7 @@ Components
 
 - Load Balancer (Apache HTTP Server 2.4)
 - Auth Server (Keycloak 9.0.3)
-- Cache Server (Infinispan 9.2.24.Final)
+- Cache Server (Infinispan 9.4.11.Final)
 - Database (Postgresql 12.4)
 - DNS (Docker Network)
 
