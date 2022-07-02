@@ -1,0 +1,95 @@
+<infinispan
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="urn:infinispan:config:13.0 https://infinispan.org/schemas/infinispan-config-13.0.xsd
+                            urn:infinispan:server:13.0 https://infinispan.org/schemas/infinispan-server-13.0.xsd"
+        xmlns="urn:infinispan:config:13.0"
+        xmlns:server="urn:infinispan:server:13.0"
+        xmlns:jdbc="urn:infinispan:config:store:jdbc:13.0">
+
+    <cache-container name="default" statistics="true">
+        <local-cache-configuration name="persistent-jdbc-string-keyed-postgres">
+            <persistence>
+                <string-keyed-jdbc-store xmlns="urn:infinispan:config:store:jdbc:13.0"
+                                         shared="false" preload="false" fetch-state="true" purge="false">
+                    <data-source jndi-url="jboss/datasources/KeycloakDS"/>
+                    <string-keyed-table prefix="kc_ispn">
+                        <id-column name="id" type="VARCHAR"/>
+                        <!-- bytea = VARIABLE BINARY type -->
+                        <data-column name="datum" type="bytea"/>
+                        <timestamp-column name="version" type="BIGINT"/>
+                        <segment-column name="segment" type="INT"/>
+                    </string-keyed-table>
+                </string-keyed-jdbc-store>
+            </persistence>
+        </local-cache-configuration>
+
+        <local-cache name="work" configuration="persistent-jdbc-string-keyed-postgres"/>
+        <local-cache name="realms" configuration="persistent-jdbc-string-keyed-postgres"/>
+        <local-cache name="users" configuration="persistent-jdbc-string-keyed-postgres"/>
+        <local-cache name="sessions" configuration="persistent-jdbc-string-keyed-postgres"/>
+        <local-cache name="authenticationSessions" configuration="persistent-jdbc-string-keyed-postgres"/>
+        <local-cache name="offlineSessions" configuration="persistent-jdbc-string-keyed-postgres"/>
+        <local-cache name="clientSessions" configuration="persistent-jdbc-string-keyed-postgres"/>
+        <local-cache name="offlineClientSessions" configuration="persistent-jdbc-string-keyed-postgres"/>
+        <local-cache name="loginFailures" configuration="persistent-jdbc-string-keyed-postgres"/>
+        <local-cache name="authorization" configuration="persistent-jdbc-string-keyed-postgres"/>
+        <local-cache name="actionTokens" configuration="persistent-jdbc-string-keyed-postgres"/>
+    </cache-container>
+
+    <server xmlns="urn:infinispan:server:13.0">
+        <data-sources>
+            <data-source name="KeycloakDS" jndi-name="jboss/datasources/KeycloakDS" statistics="true">
+                <connection-factory driver="org.postgresql.Driver"
+                                    url="${{infinispan.datasource.url}}"
+                                    username="${{infinispan.datasource.username}}"
+                                    password="${{infinispan.datasource.password}}">
+                    <connection-property name="name">value</connection-property>
+                </connection-factory>
+                <connection-pool initial-size="1"
+                                 max-size="10"
+                                 min-size="3"
+                                 background-validation="1000"
+                                 idle-removal="1"
+                                 blocking-timeout="1000"
+                                 leak-detection="10000"/>
+            </data-source>
+        </data-sources>
+
+        <interfaces>
+            <interface name="public">
+                <inet-address value="${infinispan.bind.address:127.0.0.1}"/>
+            </interface>
+        </interfaces>
+
+        <socket-bindings default-interface="public" port-offset="${infinispan.socket.binding.port-offset:0}">
+            <socket-binding name="default" port="${infinispan.bind.port:11222}"/>
+            <socket-binding name="memcached" port="11221"/>
+        </socket-bindings>
+
+        <security>
+            <credential-stores>
+                <credential-store name="credentials" path="credentials.pfx">
+                    <clear-text-credential clear-text="secret"/>
+                </credential-store>
+            </credential-stores>
+            <security-realms>
+                <security-realm name="default">
+                    <!-- Uncomment to enable TLS on the realm -->
+                    <!-- server-identities>
+                       <ssl>
+                          <keystore path="application.keystore"
+                                    password="password" alias="server"
+                                    generate-self-signed-certificate-host="localhost"/>
+                       </ssl>
+                    </server-identities-->
+                    <properties-realm groups-attribute="Roles">
+                        <user-properties path="users.properties"/>
+                        <group-properties path="groups.properties"/>
+                    </properties-realm>
+                </security-realm>
+            </security-realms>
+        </security>
+
+        <endpoints socket-binding="default" security-realm="default" />
+    </server>
+</infinispan>

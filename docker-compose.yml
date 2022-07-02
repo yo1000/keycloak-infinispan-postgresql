@@ -1,5 +1,59 @@
 version: "3.8"
 
+x-env-ispn: &env-ispn
+  INFINISPAN_DATASOURCE_URL: "jdbc:postgresql://postgres-ispn:5432/infinispan"
+  INFINISPAN_DATASOURCE_USERNAME: postgres
+  INFINISPAN_DATASOURCE_PASSWORD: postgres
+  USER: ispn
+  PASS: ispn
+
+x-env-kc: &env-kc
+  KEYCLOAK_ADMIN: admin
+  KEYCLOAK_ADMIN_PASSWORD: admin
+  PROXY_ADDRESS_FORWARDING: true
+
+  # Cluster
+  KC_CACHE: local # Choose by 'local', 'ispn' (=Enable JGroup)
+  KC_CACHE_CONFIG_FILE: cache-ispn.xml
+
+  # Database
+  KC_DB: postgres
+  KC_DB_URL: "jdbc:postgresql://postgres-kc:5432/keycloak?currentSchema=public"
+  KC_DB_SCHEMA: public
+  KC_DB_USERNAME: postgres
+  KC_DB_PASSWORD: postgres
+
+  # Hostname
+  KC_HOSTNAME: localhost
+  # Configure to workaround the failure to access third-party cookie validation URLs when using "http".
+  # The URL:
+  # - /realms/master/protocol/openid-connect/3p-cookies/step1.html?version=*
+  # Refs:
+  # - https://github.com/keycloak/keycloak/issues/11170
+  # - https://www.keycloak.org/server/hostname#_accessing_keycloak_in_production_mode_using_http
+  KC_HOSTNAME_STRICT_HTTPS: false
+
+  # HTTP/TLS
+  KC_HTTP_ENABLED: true
+
+  # Health
+  KC_HEALTH_ENABLED: true # Enable to /health, /health/ready, /health/live
+
+  # Proxy
+  KC_PROXY: edge # Chose by 'edge', 'reencrypt', 'passthrough'
+
+  # Logging
+  KC_LOG: console
+  KC_LOG_CONSOLE_OUTPUT: default # Chose by 'default', 'json'
+  KC_LOG_LEVEL: info
+
+  INFINISPAN_CLIENT_HOTROD_HOST: ispn
+  INFINISPAN_CLIENT_HOTROD_PORT: 11222
+
+  INFINISPAN_CLIENT_HOTROD_AUTH_REALM: default
+  INFINISPAN_CLIENT_HOTROD_AUTH_USERNAME: ispn
+  INFINISPAN_CLIENT_HOTROD_AUTH_PASSWORD: ispn
+
 networks:
   kcispnpg:
     name: kcispnpg
@@ -32,19 +86,7 @@ services:
       kcispnpg:
         aliases:
           - ispn
-    ports:
-      - 9990:9990
-      - 8080:8080
-      #- 11222:11222
-    environment:
-      DATABASE_HOST: postgres-ispn:5432
-      DATABASE_NAME: infinispan
-      DATABASE_USERNAME: postgres
-      DATABASE_PASSWORD: postgres
-      MGMT_USER: admin
-      MGMT_PASS: admin
-      APP_USER: ispn
-      APP_PASS: ispn
+    environment: *env-ispn
 
   ispn-node2:
     build: ./infinispan
@@ -53,70 +95,21 @@ services:
       kcispnpg:
         aliases:
           - ispn
-    ports:
-      - 9991:9990
-      - 8081:8080
-      #- 11222:11222
-    environment:
-      DATABASE_HOST: postgres-ispn:5432
-      DATABASE_NAME: infinispan
-      DATABASE_USERNAME: postgres
-      DATABASE_PASSWORD: postgres
-      MGMT_USER: admin
-      MGMT_PASS: admin
-      APP_USER: ispn
-      APP_PASS: ispn
+    environment: *env-ispn
 
   kc-node1:
     build: ./keycloak
     container_name: kc-node1
     networks:
       - kcispnpg
-    environment:
-      DATABASE_HOST: postgres-kc:5432
-      DATABASE_NAME: keycloak
-      DATABASE_USERNAME: postgres
-      DATABASE_PASSWORD: postgres
-      KEYCLOAK_FRONTEND_URL: http://localhost/auth
-      KEYCLOAK_ADMIN_USERNAME: admin
-      KEYCLOAK_ADMIN_PASSWORD: admin
-      INFINISPAN_REMOTE_CACHE_HOST: ispn
-      # Optional (default: 11222)
-      INFINISPAN_REMOTE_CACHE_PORT: 11222
-      INFINISPAN_CLIENT_HOTROD_AUTH_USERNAME: ispn
-      INFINISPAN_CLIENT_HOTROD_AUTH_PASSWORD: ispn
-      # Optional (default: ${INFINISPAN_REMOTE_CACHE_HOST})
-      INFINISPAN_CLIENT_HOTROD_AUTH_SERVER_NAME: ispn
-      # Optional (default: ApplicationRealm)
-      INFINISPAN_CLIENT_HOTROD_AUTH_REALM: ApplicationRealm
-      # Optional (default: PLAIN)
-      INFINISPAN_CLIENT_HOTROD_SASL_MECHANISM: PLAIN
+    environment: *env-kc
 
   kc-node2:
     build: ./keycloak
     container_name: kc-node2
     networks:
       - kcispnpg
-    environment:
-      DB_VENDOR: postgres
-      DATABASE_HOST: postgres-kc:5432
-      DATABASE_NAME: keycloak
-      DATABASE_USERNAME: postgres
-      DATABASE_PASSWORD: postgres
-      KEYCLOAK_FRONTEND_URL: http://localhost/auth
-      KEYCLOAK_ADMIN_USERNAME: admin
-      KEYCLOAK_ADMIN_PASSWORD: admin
-      INFINISPAN_REMOTE_CACHE_HOST: ispn
-      # Optional (default: 11222)
-      INFINISPAN_REMOTE_CACHE_PORT: 11222
-      INFINISPAN_CLIENT_HOTROD_AUTH_USERNAME: ispn
-      INFINISPAN_CLIENT_HOTROD_AUTH_PASSWORD: ispn
-      # Optional (default: ${INFINISPAN_REMOTE_CACHE_HOST})
-      INFINISPAN_CLIENT_HOTROD_AUTH_SERVER_NAME: ispn
-      # Optional (default: ApplicationRealm)
-      INFINISPAN_CLIENT_HOTROD_AUTH_REALM: ApplicationRealm
-      # Optional (default: PLAIN)
-      INFINISPAN_CLIENT_HOTROD_SASL_MECHANISM: PLAIN
+    environment: *env-kc
 
   kc-lb:
     image: httpd:2.4
@@ -127,7 +120,7 @@ services:
     networks:
       - kcispnpg
     ports:
-      - 80:80
+      - "80:80"
     volumes:
       - ./load-balancer/httpd.conf:/usr/local/apache2/conf/httpd.conf
     environment:

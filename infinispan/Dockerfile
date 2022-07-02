@@ -1,17 +1,9 @@
-FROM jboss/infinispan-server:9.4.11.Final
+FROM infinispan/server:13.0.10.Final-2
 
 USER root
-COPY ./conf/standalone.xml $INFINISPAN_SERVER_HOME/standalone/configuration/
-COPY ./docker-entrypoint.sh /usr/local/bin
-
-COPY ./lib/* $HOME
-RUN $INFINISPAN_SERVER_HOME/bin/ispn-cli.sh --command="module add \
-    --name=org.postgresql \
-    --resources=postgresql-42.2.19.jar \
-    --dependencies=javax.api,javax.transaction.api"
+COPY ./lib/* /opt/infinispan/server/lib/
+COPY ./conf/infinispan.xml /opt/infinispan/server/conf/infinispan.xml
+COPY ./docker-entrypoint.sh /usr/local/bin/docker-entrypoint.sh
 
 USER 1000
-ENTRYPOINT ["docker-entrypoint.sh", "standalone"]
-
-# Expose Infinispan server  ports
-EXPOSE 7600 8080 8181 8888 9990 11211 11222 57600
+ENTRYPOINT ["/usr/local/bin/docker-entrypoint.sh"]

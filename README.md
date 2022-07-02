@@ -56,8 +56,8 @@ without being asked to sign-on again and with the authentication session keeped.
 Components
 
 - Load Balancer (Apache HTTP Server 2.4)
-- Auth Server (Keycloak 9.0.3)
-- Cache Server (Infinispan 9.4.11.Final)
+- Auth Server (Keycloak 18.0.2)
+- Cache Server (Infinispan 13.0.10.Final-2)
 - Database (Postgresql 12.4)
 - DNS (Docker Network)
 
