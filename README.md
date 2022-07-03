@@ -75,5 +75,4 @@ Client _____ ALB _____ KC1 _____ NLB _____ ISPN1 _____ RDS Aurora PostgreSQL
 
 ## Configuration Hint
 
-Enabling sticky sessions at the LB layer has the advantage of improving caching efficiency.
-On the other hand, however, setting too long a Max-Age for cookies has the disadvantage that accesses will not be distributed quickly during scale-out.
+Realms cache is configured to remain only in the local cache of each node, as linking the Realms cache with the remote store would be very performance degrading. This means that if the realm settings are changed, a node restart is required for the settings to be reflected on each node. However, in the configuration of this code base, Keycloak does not depend on JGroup, and restarting a node at any time does not destroy the session or other caches, so it can be safely restarted.
