@@ -28,7 +28,7 @@ docker compose up --build
 
 2. Sign on to Security admin console
 
-http://localhost/auth/admin/
+http://localhost/admin/
 
 * Username: `admin`
 * Password: `admin`
